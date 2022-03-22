@@ -1,0 +1,30 @@
+# If you come from bash you might have to change your $PATH.
+export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+
+# Import Profile
+source ~/.profile
+
+# oh my posh
+eval "$(oh-my-posh prompt init zsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/microverse-power.omp.json)"
+
+export EDITOR='vim'
+
+{{- if eq .chezmoi.hostname "tartaros" }}
+function pls_add() {
+	usage="$FUNCNAME <playlist name> <beet query> -- easily add a track from Beets to a playlist in your Playlist folder."
+	MUSICDIR=$(beet config | grep ^directory: | sed 's/directory: //')
+	PLAYLIST=$1
+	shift
+	FILES=$(beet ls -p $*)
+	if [ ${#FILES} -ne 0 ]; then
+		echo "Adding tracks:"
+		echo $FILES
+		echo $FILES | sed "s,$MUSICDIR,..," >> "$MUSICDIR/Playlists/$PLAYLIST.m3u"
+		echo "Added $(echo $FILES | wc -l) track$([[ $(echo $FILES | wc -l) > 1 ]] && echo 's') to Playlists/$PLAYLIST.m3u"
+	else
+		echo "No tracks found."
+		return
+	fi
+
+}
+{{- end }}

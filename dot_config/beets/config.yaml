@@ -1,0 +1,211 @@
+directory: /mnt/media/Music Library
+library: /mnt/media/library.db
+
+pluginpath: ~/.config/beets/otherplugins
+plugins:
+  - bandcamp
+  # - beatport
+  # - discogs
+  # - vgmdb
+  - albumtypes
+  - acousticbrainz
+  - bucket
+  - convert
+  # describe
+  - duplicates
+  - edit
+  - embedart
+  - fetchart
+  - fish
+  - lyrics
+  # - ftintitle
+  - importfeeds
+  # - importadded
+  - info
+  - inline
+  - lastgenre
+  - lastimport
+  - mbcollection
+  - mbsync
+  - mbsubmit
+  - mpdstats
+  # - mpdupdate
+  - missing
+  - random
+  - replaygain
+  - rewrite
+  # - spotify
+  - the
+  - types
+  - web
+  - ydl
+  - playlist
+  - smartplaylist
+  # Library Updates
+  - plexupdate
+
+threaded: yes
+ui:
+  color: yes
+
+  #asciify_paths: yes
+original_date: yes
+
+import:
+  languages: en jp
+  move: yes
+  write: yes
+  log: ~/.config/beets/import.log
+
+importfeeds:
+  dir: /mnt/media/Imports
+  formats: m3u
+  m3u_name: importfeed.m3u
+  relative_to: /mnt/media/Imports
+
+replace:
+  '–': '-'
+  ':': ' -'
+  '\?': ''
+  '\*': ''
+  '\$4cR1f1c14\|_': '$4cR1f1c14L'
+  '[\\/]': _
+  '^\.': _
+  '[\x00-\x1f]': _
+  '[<>:"\?\*\|]': _
+  '\.$': _
+  '\s+$': ''
+  '^\s+': ''
+  '^-': _
+
+paths:
+  default: %ifdef{collection,Collections/$collection/[$year] %the{$albumartist} - ,Albums/%the{$albumartist}/[$year] }$album%aunique{} $atypes/$track $itemartist $title
+  
+  # Special Collection Types
+  ## DJ Sets (tag $group to group by event)
+  tracktype:djset: DJ Sets/%ifdef{group,$group/}[$year] $artist - $title
+  ## Soundscapes (tag $trackgroup=true to keep together)
+  tracktype:soundscape: Soundscapes/%if{$trackgroup,%the{$albumartist}/$album/$track $itemartist $title,$artist - $title}
+  # And now, everything else
+  singleton: %ifdef{collection,Collections/$collection/,Singles/%bucket{%asciify{%the{$artist}}, alpha}/}%the{$artist} - $title [$year]
+  albumtype:soundtrack: %ifdef{collection,Collections/$collection/,Soundtracks/}$album%aunique{} ($albumartist, $year) $atypes/$track $itemartist $title
+  comp: %ifdef{collection,Collections/$collection/,Compilations/}$album%aunique{} ($year) $atypes/$track $itemartist $title
+
+# Playlist Config
+
+playlist:
+  auto: yes
+  playlist_dir: /mnt/media/Music Library/Playlists
+  relative_to: playlist
+
+smartplaylist:
+  playlist_dir: /mnt/media/Music Library/Playlists/Auto
+  relative_to: /mnt/media/Music Library/Playlists/Auto
+  playlists:
+    - name: Beets - Recently Added.m3u
+      query: 'added:-2w.. added-'
+      # All tracks added in the last 2 weeks, sorted by newest
+    - name: Beets - Soundtracks.m3u
+      album_query: 'albumtype:soundtrack album+'
+    - name: Beets - DJ Sets.m3u
+      query: 'tracktype:djset'
+    - name: Beets - Soundscapes.m3u
+      query: 'tracktype:soundscape'
+    - name: Labels - Cryo Chamber.m3u
+      query: 'label:"Cryo Chamber"'
+    - name: Labels - Cover Corp (Hololive).m3u
+      query: ['label:"cover corp"', 'label:"カバー株式会社"', 'collection:Hololive year+']
+
+# Plugin Config
+
+types:
+  bpm: float
+  tracks: int
+
+musicbrainz:
+  user: Neurario
+  pass: Xcchyadg
+
+mbcollection:
+  collection: f82b8524-768e-434a-8372-9657f8c34d26
+  
+fetchart:
+  auto: yes
+  minwidth: 800
+  enforce_ratio: 8px
+  sources: filesystem coverart itunes *
+
+embedart:
+  remove_art_file: yes
+
+convert:
+  auto: yes
+  command: ffmpeg -i $source -y -vn -aq 2 $dest
+  extension: mp3
+
+the:
+  a: no
+
+bucket:
+  bucket_alpha: ['0-9', 'A-B', 'C-F', 'G-M', 'N-S', 'T-Z']
+
+bandcamp:
+  preferred_media: Digital,CD,Vinyl
+  art: true
+  source_weight: 0.4
+  # split_artist_title: true
+
+item_fields:
+  itemartist: |
+    import re
+
+    ssMatch = re.search("\((.+)\)$", artist)
+    if albumartist != artist and albumartist == "Simon Says" and ssMatch is not None:
+      # If it's one of my mashups and I list the artists in the artist tag,
+      # Strip my name and just list the artists used as the 'track artist'
+      return '- ' + ssMatch.group()[1:-1] + ' -'
+    elif albumartist != artist:
+      # Otherwise, just list the artist if it's different from the album artist
+      return '- ' + artist + ' -'
+    else:
+      # Or nothing if the artist is the same as the album artist
+      return '-'
+
+album_fields:
+  tracks: len(items)
+
+rewrite:
+  artist 沙漠里的沙子晚上很温暖: desert sand feels warm at night
+  # Hololive
+  artist Mori Calliope: Calliope Mori
+  artist Ina'nis Ninomae: Ninomae Ina'nis
+  artist Calliope Mori, Takanashi Kiara, Ninomae Ina’nis, Gawr Gura, Amelia Watson & Hololive English -Myth-: Hololive English -Myth-
+
+importadded:
+  preserve_mtimes: yes
+
+lastfm:
+  user: Splatsune
+
+mpd:
+  port: 6600
+
+web:
+  host: 0.0.0.0
+
+plex:
+  host: 192.168.0.100
+  port: 32400
+  token: H2Lguzf5fnXE2Huig4g-
+  library_name: Music
+  secure: false
+
+spotify:
+  source_weight: 0.1
+
+replaygain:
+  backend: command
+  auto: yes
+
+lyrics:
+  sources: genius *
