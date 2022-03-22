@@ -68,7 +68,6 @@ replace:
   ':': ' -'
   '\?': ''
   '\*': ''
-  '\$4cR1f1c14\|_': '$4cR1f1c14L'
   '[\\/]': _
   '^\.': _
   '[\x00-\x1f]': _
@@ -123,8 +122,8 @@ types:
   tracks: int
 
 musicbrainz:
-  user: Neurario
-  pass: Xcchyadg
+  user: {{ (bitwarden "item" "musicbrainz.org").login.username }}
+  pass: {{ (bitwarden "item" "musicbrainz.org").login.password }}
 
 mbcollection:
   collection: f82b8524-768e-434a-8372-9657f8c34d26
@@ -194,7 +193,7 @@ web:
   host: 0.0.0.0
 
 plex:
-  host: 192.168.0.100
+  host: 10.0.0.3
   port: 32400
   token: H2Lguzf5fnXE2Huig4g-
   library_name: Music

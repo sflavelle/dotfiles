@@ -10,6 +10,7 @@ eval "$(oh-my-posh prompt init zsh --config https://raw.githubusercontent.com/Ja
 export EDITOR='vim'
 
 {{- if eq .chezmoi.hostname "tartaros" }}
+
 function pls_add() {
 	usage="$FUNCNAME <playlist name> <beet query> -- easily add a track from Beets to a playlist in your Playlist folder."
 	MUSICDIR=$(beet config | grep ^directory: | sed 's/directory: //')
